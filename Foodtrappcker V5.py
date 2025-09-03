@@ -20,12 +20,31 @@ LS_META_KEY = "diario_comidas_v9_meta"  # {"last_reset":"YYYY-MM-DD"}
 # ---------- CSS (responsive/compacto) ----------
 st.markdown("""
 <style>
-.block-container {padding-top: 1rem; padding-bottom: 1.25rem;}
+/* Ajustes globales */
+.block-container {
+    padding-top: 0.5rem !important;   /* menos espacio arriba */
+    padding-bottom: 1rem !important;
+}
+
+/* Ajusta títulos */
+h1, h2, h3 {
+    margin-top: 0.2rem !important;
+    margin-bottom: 0.6rem !important;
+}
+
+/* Opcional: reduce la franja de cabecera */
+header[data-testid="stHeader"] {
+    height: 2rem;
+    background: transparent;
+}
+
+/* Mantiene lo responsive */
 .fullwidth .stButton>button {width: 100%;}
 input, textarea, select {font-size: 0.95rem;}
 [data-baseweb="select"] {font-size: 0.95rem;}
 div[data-testid="stHorizontalBlock"] {overflow-x: hidden;}
 [role="progressbar"] div {font-size: 0.9rem;}
+
 @media (max-width: 640px) {
   .block-container {padding-left: 0.8rem; padding-right: 0.8rem;}
   h1, h2, h3 {font-size: 1.05rem;}
