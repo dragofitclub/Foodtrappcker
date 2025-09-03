@@ -1027,7 +1027,15 @@ alimentos_df = pd.DataFrame(BASE_INTERNA).sort_values("nombre").reset_index(drop
 # =========================
 # Cálculos de metas
 # =========================
-OBJETIVOS_FUERZA = {"Aumentar masa muscular", "Mejorar rendimiento físico", "Mejorar rendimiento fisico"}
+# Objetivos que activan el ajuste de proteína y calorías
+# (incluye variantes para mantener compatibilidad hacia atrás)
+OBJETIVOS_FUERZA = {
+    "Aumentar Masa Muscular",
+    "Mejorar Rendimiento Fisico",
+    "Aumentar masa muscular",
+    "Mejorar rendimiento físico",
+    "Mejorar rendimiento fisico",
+}
 
 def meta_proteina(peso_kg: float, genero: str, objetivos: List[str]) -> float:
     especial = bool(OBJETIVOS_FUERZA.intersection(set(map(str.strip, objetivos))))
@@ -1052,7 +1060,7 @@ def meta_agua_ml(peso_kg: float) -> int:
 
 def totales_del_dia(rows: List[Dict]):
     kcal = sum(r["kcal_tot"] for r in rows if r["tipo"] == "Comida")
-    prot = sum(r["prot_tot"] for r in rows if r["tipo"] == "Comida")
+    prot = sum(r["prot_tot"] for r in rows if r["tipo"] == "Comida")  # <-- si usas 'if' en español, cámbialo a if
     agua = sum(r.get("hidr_tot_ml", 0) for r in rows)
     return kcal, prot, agua
 
@@ -1196,10 +1204,19 @@ def ui_datos():
                            value=float(pf.get("peso", 70.0)), step=0.5, format="%.1f")
     altura = st.number_input("Altura (cm)", min_value=120.0, max_value=230.0,
                              value=float(pf.get("altura", 170.0)), step=0.5, format="%.1f")
-    objetivos = st.multiselect("Objetivo(s)",
-                               ["Bajar grasa","Mantener","Aumentar masa muscular","Mejorar rendimiento físico"],
-                               default=pf.get("objetivos", []))
-    st.caption("Si marcas *Aumentar masa muscular* o *Mejorar rendimiento físico*, las metas se ajustan.")
+    objetivos = st.multiselect(
+        "Objetivo(s)",
+        [
+            "Perder Peso",
+            "Tonificar / Bajar Grasa",
+            "Aumentar Masa Muscular",
+            "Aumentar Energia",
+            "Mejorar Rendimiento Fisico",
+            "Mejorar Salud",
+        ],
+        default=pf.get("objetivos", []),
+    )
+    
     st.session_state.perfil = {
         "nombre": nombre, "genero": genero, "edad": int(edad),
         "peso": float(peso), "altura": float(altura), "objetivos": objetivos
@@ -1384,4 +1401,3 @@ try:
 except Exception:
     pass
 
-st.caption("App Diario de Comidas · v10 · Persistencia local + Auto-reset diario a medianoche (hora local del dispositivo)")
