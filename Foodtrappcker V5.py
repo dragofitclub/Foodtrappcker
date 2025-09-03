@@ -13,6 +13,42 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="Diario de Comidas (Reset 00:00)", layout="wide")
 HORA_FMT = "%H:%M"
 
+import streamlit.components.v1 as components
+
+# --- Chequeo de compatibilidad JS (named capture groups en RegExp) ---
+components.html("""
+<script>
+(function () {
+  try {
+    // Si el navegador NO soporta grupos con nombre, esto lanza un SyntaxError
+    new RegExp("(?<grp>a)");
+  } catch (e) {
+    const msg = `
+      <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto; 
+                  padding:16px; border-radius:12px; 
+                  background:#2b2626; color:#fff; 
+                  border:1px solid #7a3;">
+        <div style="font-size:18px; font-weight:700; margin-bottom:6px;">
+          Tu navegador es incompatible con esta app
+        </div>
+        <div style="opacity:.9; line-height:1.35;">
+          Para usarla, actualiza tu navegador o usa <b>Chrome</b> o <b>Firefox</b>.
+          <br>En iPhone/iPad, actualiza iOS (Safari moderno requerido).
+        </div>
+      </div>`;
+    const host = window.parent?.document?.querySelector('section.main') 
+                 || document.body;
+    const c = document.createElement('div');
+    c.style.margin = '16px';
+    c.innerHTML = msg;
+    host.prepend(c);
+    // Evita que se sigan montando componentes que podrían fallar
+    throw new Error("Browser not supported: missing RegExp named groups");
+  }
+})();
+</script>
+""", height=0)
+
 # Claves en localStorage
 LS_DATA_KEY = "diario_comidas_v9"       # perfil + logs
 LS_META_KEY = "diario_comidas_v9_meta"  # {"last_reset":"YYYY-MM-DD"}
