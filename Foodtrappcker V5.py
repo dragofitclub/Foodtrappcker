@@ -132,13 +132,6 @@ BASE_INTERNA: List[Dict] = [
     "hidr_ml": 0
   },
   {
-    "nombre": "Huevo griego descremado",
-    "porcion_desc": "100g",
-    "kcal": 59.0,
-    "proteina_g": 10.0,
-    "hidr_ml": 0
-  },
-  {
     "nombre": "Requesón (cottage 2%)",
     "porcion_desc": "100g",
     "kcal": 82.0,
