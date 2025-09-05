@@ -1089,6 +1089,15 @@ def etiqueta_color(valor: float, objetivo: float, regla: str) -> str:
     else:
         return "🟢" if valor >= objetivo else "🔴"
 
+# Color para pintar números (verde si cumple, rojo si no)
+def color_hex(valor: float, objetivo: float, regla: str) -> str:
+    if objetivo <= 0:
+        return "#ffffff"
+    if regla == "menor_mejor":
+        return "#2ecc71" if valor <= objetivo else "#e74c3c"
+    else:
+        return "#2ecc71" if valor >= objetivo else "#e74c3c"
+
 def agregar_fila(nombre: str, porciones: float, item: Dict|None, hidr_ml_override: float | None = None):
     ahora = datetime.now().strftime(HORA_FMT)
     kcal = (item["kcal"] * porciones) if item else 0.0
@@ -1162,7 +1171,7 @@ with st.expander("1) Datos de la persona y requerimientos", expanded=True):
                 st.session_state.fecha = date.today()
 
 # =========================
-# 2) Barras de progreso
+# 2) Barras de progreso (número acumulado coloreado)
 # =========================
 if st.session_state.perfil:
     kcal_tot, prot_tot, agua_tot = totales_diarios()
@@ -1176,31 +1185,39 @@ if st.session_state.perfil:
     with pc1:
         ratio = min(1.0, (kcal_tot / kcal_obj) if kcal_obj > 0 else 0.0)
         st.progress(ratio, text=f"Calorías: {kcal_tot:.0f}/{kcal_obj:.0f} kcal ({ratio*100:.0f}%)")
-        etiqueta = etiqueta_color(kcal_tot, kcal_obj, "menor_mejor")
-        st.markdown(f"**Estado:** {etiqueta}")
+        col = color_hex(kcal_tot, kcal_obj, "menor_mejor")
+        st.markdown(
+            f"**Acumulado:** <span style='color:{col};font-weight:700'>{kcal_tot:.0f}</span> kcal",
+            unsafe_allow_html=True
+        )
 
     with pc2:
         ratio = min(1.0, (prot_tot / prot_obj) if prot_obj > 0 else 0.0)
         st.progress(ratio, text=f"Proteína: {prot_tot:.1f}/{prot_obj:.1f} g ({ratio*100:.0f}%)")
-        etiqueta = etiqueta_color(prot_tot, prot_obj, "mayor_mejor")
-        st.markdown(f"**Estado:** {etiqueta}")
+        col = color_hex(prot_tot, prot_obj, "mayor_mejor")
+        st.markdown(
+            f"**Acumulado:** <span style='color:{col};font-weight:700'>{prot_tot:.1f}</span> g",
+            unsafe_allow_html=True
+        )
 
     with pc3:
         ratio = min(1.0, (agua_tot / agua_obj) if agua_obj > 0 else 0.0)
         st.progress(ratio, text=f"Hidratación: {agua_tot:.0f}/{agua_obj:.0f} ml ({ratio*100:.0f}%)")
-        etiqueta = etiqueta_color(agua_tot, agua_obj, "mayor_mejor")
-        st.markdown(f"**Estado:** {etiqueta}")
+        col = color_hex(agua_tot, agua_obj, "mayor_mejor")
+        st.markdown(
+            f"**Acumulado:** <span style='color:{col};font-weight:700'>{agua_tot:.0f}</span> ml",
+            unsafe_allow_html=True
+        )
 
 # =========================
 # 3) Registro de comidas (solo select + porciones)
 # =========================
 st.subheader("Registro de comidas")
 
-# Opciones directamente desde BASE_INTERNA
 def etiqueta_item(it: Dict) -> str:
     return f"{it['nombre']} — {it['porcion_desc']} · {it['kcal']} kcal · {it['proteina_g']} g prot"
 
-lista_items = BASE_INTERNA[:]  # mantener orden provisto
+lista_items = BASE_INTERNA[:]
 labels = [etiqueta_item(it) for it in lista_items]
 
 with st.form("form_comida", clear_on_submit=True):
@@ -1246,7 +1263,7 @@ with col_btn2:
         st.session_state.diario = []
 
 # =========================
-# 5) Resumen + Exportar
+# 5) Resumen + Exportar (número acumulado coloreado)
 # =========================
 if st.session_state.perfil:
     kcal_tot, prot_tot, agua_tot = totales_diarios()
@@ -1257,48 +1274,97 @@ if st.session_state.perfil:
     st.markdown("---")
     c1, c2, c3 = st.columns(3)
     with c1:
-        et = etiqueta_color(kcal_tot, kcal_obj, "menor_mejor")
-        st.markdown(f"### Calorías\n**{kcal_tot:.0f} / {kcal_obj:.0f} kcal** {et}")
+        col = color_hex(kcal_tot, kcal_obj, "menor_mejor")
+        st.markdown(
+            f"### Calorías\n<span style='font-weight:700;color:{col}'>{kcal_tot:.0f}</span> / {kcal_obj:.0f} kcal",
+            unsafe_allow_html=True
+        )
     with c2:
-        et = etiqueta_color(prot_tot, prot_obj, "mayor_mejor")
-        st.markdown(f"### Proteína\n**{prot_tot:.1f} / {prot_obj:.1f} g** {et}")
+        col = color_hex(prot_tot, prot_obj, "mayor_mejor")
+        st.markdown(
+            f"### Proteína\n<span style='font-weight:700;color:{col}'>{prot_tot:.1f}</span> / {prot_obj:.1f} g",
+            unsafe_allow_html=True
+        )
     with c3:
-        et = etiqueta_color(agua_tot, agua_obj, "mayor_mejor")
-        st.markdown(f"### Hidratación\n**{agua_tot:.0f} / {agua_obj:.0f} ml** {et}")
+        col = color_hex(agua_tot, agua_obj, "mayor_mejor")
+        st.markdown(
+            f"### Hidratación\n<span style='font-weight:700;color:{col}'>{agua_tot:.0f}</span> / {agua_obj:.0f} ml",
+            unsafe_allow_html=True
+        )
 
-    buffer = io.BytesIO()
-    with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
-        df_export = construir_df_diario()
-        df_export.to_excel(writer, index=False, sheet_name="Diario")
+    # Datos para exportar
+    df_export = construir_df_diario()
+    resumen = pd.DataFrame({
+        "Métrica": ["Calorías (kcal)", "Proteína (g)", "Hidratación (ml)"],
+        "Total del día": [round(kcal_tot,0), round(prot_tot,1), round(agua_tot,0)],
+        "Objetivo": [round(kcal_obj,0), round(prot_obj,1), round(agua_obj,0)],
+    })
+    perfil = pd.DataFrame([{
+        "Peso (kg)": st.session_state.perfil["peso_kg"],
+        "Altura (cm)": st.session_state.perfil["altura_cm"],
+        "Edad": st.session_state.perfil["edad"],
+        "Género": st.session_state.perfil["genero"],
+        "Objetivo": st.session_state.perfil["objetivo"],
+        "Fecha": st.session_state.fecha.strftime("%Y-%m-%d"),
+    }])
 
-        resumen = pd.DataFrame({
-            "Métrica": ["Calorías (kcal)", "Proteína (g)", "Hidratación (ml)"],
-            "Total del día": [round(kcal_tot,0), round(prot_tot,1), round(agua_tot,0)],
-            "Objetivo": [round(kcal_obj,0), round(prot_obj,1), round(agua_obj,0)],
-        })
-        perfil = pd.DataFrame([{
-            "Peso (kg)": st.session_state.perfil["peso_kg"],
-            "Altura (cm)": st.session_state.perfil["altura_cm"],
-            "Edad": st.session_state.perfil["edad"],
-            "Género": st.session_state.perfil["genero"],
-            "Objetivo": st.session_state.perfil["objetivo"],
-            "Fecha": st.session_state.fecha.strftime("%Y-%m-%d"),
-        }])
-        resumen.to_excel(writer, index=False, sheet_name="Resumen")
-        ws = writer.sheets["Resumen"]
-        start_row = len(resumen) + 2
-        for col_idx, col_name in enumerate(perfil.columns):
-            ws.write(start_row, col_idx, col_name)
-        for row_idx in range(len(perfil)):
-            for col_idx, col_name in enumerate(perfil.columns):
-                ws.write(start_row + 1 + row_idx, col_idx, perfil.iloc[row_idx][col_name])
+    # Detectar engine disponible para Excel
+    excel_engine = None
+    try:
+        import xlsxwriter  # noqa: F401
+        excel_engine = "xlsxwriter"
+    except Exception:
+        try:
+            import openpyxl  # noqa: F401
+            excel_engine = "openpyxl"
+        except Exception:
+            excel_engine = None
 
-    st.download_button(
-        label="📥 Exportar Diario (Excel)",
-        data=buffer.getvalue(),
-        file_name=f"diario_comidas_{st.session_state.fecha.isoformat()}.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        use_container_width=True
-    )
+    if excel_engine:
+        buffer = io.BytesIO()
+        with pd.ExcelWriter(buffer, engine=excel_engine) as writer:
+            df_export.to_excel(writer, index=False, sheet_name="Diario")
+            resumen.to_excel(writer, index=False, sheet_name="Resumen")
+
+            ws = writer.sheets["Resumen"]
+            start_row = len(resumen) + 2
+
+            if excel_engine == "xlsxwriter":
+                for col_idx, col_name in enumerate(perfil.columns):
+                    ws.write(start_row, col_idx, col_name)
+                for row_idx in range(len(perfil)):
+                    for col_idx, col_name in enumerate(perfil.columns):
+                        ws.write(start_row + 1 + row_idx, col_idx, perfil.iloc[row_idx][col_name])
+            else:
+                from openpyxl.utils import get_column_letter  # noqa: F401
+                for j, col_name in enumerate(perfil.columns, start=1):
+                    ws.cell(row=start_row+1, column=j, value=col_name)
+                for r in range(len(perfil)):
+                    for j, col_name in enumerate(perfil.columns, start=1):
+                        ws.cell(row=start_row+1+1+r, column=j, value=perfil.iloc[r][col_name])
+
+        st.download_button(
+            label="📥 Exportar Diario (Excel)",
+            data=buffer.getvalue(),
+            file_name=f"diario_comidas_{st.session_state.fecha.isoformat()}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True
+        )
+    else:
+        # Fallback: ZIP con CSVs si no hay engines de Excel
+        import zipfile
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("Diario.csv", df_export.to_csv(index=False))
+            zf.writestr("Resumen.csv", resumen.to_csv(index=False))
+            zf.writestr("Perfil.csv", perfil.to_csv(index=False))
+        st.warning("No se encontró `xlsxwriter` ni `openpyxl`. Se exportará un ZIP con CSVs.")
+        st.download_button(
+            label="📥 Exportar Diario (ZIP con CSVs)",
+            data=zip_buffer.getvalue(),
+            file_name=f"diario_comidas_{st.session_state.fecha.isoformat()}.zip",
+            mime="application/zip",
+            use_container_width=True
+        )
 else:
     st.info("Primero completa tus datos y calcula tus requerimientos para activar el seguimiento y la exportación.")
