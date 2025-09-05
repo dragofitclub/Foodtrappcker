@@ -1,5 +1,1 @@
-# Requerimientos para ejecutar la app Foodtrappcker V5 en Streamlit Cloud
-# Asegúrate de que este archivo se encuentre en la raíz del repositorio en GitHub
-
-streamlit>=1.32
-pandas>=2.0
+openpyxl
