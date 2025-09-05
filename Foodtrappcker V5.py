@@ -1,100 +1,50 @@
-# app_diario_comidas_v10_reset_midnight.py
+# app_diario_comidas_v2_1.py
 # -*- coding: utf-8 -*-
 
+from __future__ import annotations
 from datetime import datetime, date
 from typing import List, Dict
-import json
+import io
 
 import pandas as pd
 import streamlit as st
-import streamlit.components.v1 as components
 
-# ---------- Config ----------
-st.set_page_config(page_title="Diario de Comidas (Reset 00:00)", layout="wide")
+# =========================
+# Configuración básica
+# =========================
+st.set_page_config(page_title="Diario de Comidas", layout="wide")
 HORA_FMT = "%H:%M"
 
-import streamlit.components.v1 as components
-
-# --- Chequeo de compatibilidad JS (named capture groups en RegExp) ---
-components.html("""
-<script>
-(function () {
-  try {
-    // Si el navegador NO soporta grupos con nombre, esto lanza un SyntaxError
-    new RegExp("(?<grp>a)");
-  } catch (e) {
-    const msg = `
-      <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto; 
-                  padding:16px; border-radius:12px; 
-                  background:#2b2626; color:#fff; 
-                  border:1px solid #7a3;">
-        <div style="font-size:18px; font-weight:700; margin-bottom:6px;">
-          Tu navegador es incompatible con esta app
-        </div>
-        <div style="opacity:.9; line-height:1.35;">
-          Para usarla, actualiza tu navegador o usa <b>Chrome</b> o <b>Firefox</b>.
-          <br>En iPhone/iPad, actualiza iOS (Safari moderno requerido).
-        </div>
-      </div>`;
-    const host = window.parent?.document?.querySelector('section.main') 
-                 || document.body;
-    const c = document.createElement('div');
-    c.style.margin = '16px';
-    c.innerHTML = msg;
-    host.prepend(c);
-    // Evita que se sigan montando componentes que podrían fallar
-    throw new Error("Browser not supported: missing RegExp named groups");
-  }
-})();
-</script>
-""", height=0)
-
-# Claves en localStorage
-LS_DATA_KEY = "diario_comidas_v9"       # perfil + logs
-LS_META_KEY = "diario_comidas_v9_meta"  # {"last_reset":"YYYY-MM-DD"}
-
-# ---------- CSS (responsive/compacto) ----------
+# =========================
+# Estilos responsivos (móvil/tablet/desktop)
+# =========================
 st.markdown("""
 <style>
-/* Ajustes globales */
-.block-container {
-    padding-top: 0.5rem !important;   /* menos espacio arriba */
-    padding-bottom: 1rem !important;
+.block-container { padding-top: .5rem; padding-bottom: 2rem; max-width: 1200px; }
+.stProgress > div > div { height: 16px; border-radius: 12px; }
+.stButton > button { padding: .65rem 1rem; border-radius: 12px; }
+.stNumberInput input, .stTextInput input { border-radius: 10px; }
+
+/* Móvil */
+@media (max-width: 480px) {
+  .block-container { padding-left: .6rem; padding-right: .6rem; }
+  .stProgress > div > div { height: 22px; }
+  .stButton > button { width: 100%; font-size: 1rem; }
+  .stNumberInput label, .stTextInput label, .stSelectbox label { font-size: 0.95rem; }
+  .stDataFrame { font-size: .92rem; }
+  .st-emotion-cache-ocqkz7, .st-emotion-cache-1wmy9hl { display: block !important; }
 }
 
-/* Ajusta títulos */
-h1, h2, h3 {
-    margin-top: 0.2rem !important;
-    margin-bottom: 0.6rem !important;
-}
-
-/* Opcional: reduce la franja de cabecera */
-header[data-testid="stHeader"] {
-    height: 2rem;
-    background: transparent;
-}
-
-/* Mantiene lo responsive */
-.fullwidth .stButton>button {width: 100%;}
-input, textarea, select {font-size: 0.95rem;}
-[data-baseweb="select"] {font-size: 0.95rem;}
-div[data-testid="stHorizontalBlock"] {overflow-x: hidden;}
-[role="progressbar"] div {font-size: 0.9rem;}
-
-@media (max-width: 640px) {
-  .block-container {padding-left: 0.8rem; padding-right: 0.8rem;}
-  h1, h2, h3 {font-size: 1.05rem;}
-  .stTabs [role="tablist"] {gap: .25rem;}
-  .stTabs [role="tab"] {padding: .3rem .55rem;}
-  .stDataFrame {font-size: 0.9rem;}
+/* Tablet */
+@media (min-width: 481px) and (max-width: 1024px) {
+  .stProgress > div > div { height: 20px; }
+  .stButton > button { font-size: .95rem; }
 }
 </style>
 """, unsafe_allow_html=True)
 
 # =========================
-# BASE INCRUSTADA DESDE EXCEL (hoja BibliotecaComida)
-# No depende de archivos externos.
-# Campos: nombre | porcion_desc | kcal | proteina_g | hidr_ml (0 por defecto)
+# BASE INTERNA (proporcionada)
 # =========================
 BASE_INTERNA: List[Dict] = [
   {
@@ -130,6 +80,20 @@ BASE_INTERNA: List[Dict] = [
     "porcion_desc": "100g",
     "kcal": 144.0,
     "proteina_g": 23.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Atún en lata (en aceite)",
+    "porcion_desc": "1 unidad (120g)",
+    "kcal": 250.0,
+    "proteina_g": 26.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Atún en lata (en agua)",
+    "porcion_desc": "1 unidad (120g)",
+    "kcal": 120.0,
+    "proteina_g": 28.0,
     "hidr_ml": 0
   },
   {
@@ -456,7 +420,7 @@ BASE_INTERNA: List[Dict] = [
   },
   {
     "nombre": "Papa (Cocida)",
-    "porcion_desc": "150g",
+    "porcion_desc": "1 unidad (150g)",
     "kcal": 130.0,
     "proteina_g": 3.0,
     "hidr_ml": 0
@@ -490,10 +454,10 @@ BASE_INTERNA: List[Dict] = [
     "hidr_ml": 0
   },
   {
-    "nombre": "Aceitunas",
-    "porcion_desc": "100g",
-    "kcal": 115.0,
-    "proteina_g": 0.8,
+    "nombre": "Aceituna verde deshuesada",
+    "porcion_desc": "1 unidad",
+    "kcal": 5,
+    "proteina_g": 0.05,
     "hidr_ml": 0
   },
   {
@@ -1058,382 +1022,290 @@ BASE_INTERNA: List[Dict] = [
   }
 ]
 
-alimentos_df = pd.DataFrame(BASE_INTERNA).sort_values("nombre").reset_index(drop=True)
+# =========================
+# Estado inicial
+# =========================
+if "fecha" not in st.session_state:
+    st.session_state.fecha = date.today()
+
+if "perfil" not in st.session_state:
+    st.session_state.perfil = None
+
+if "requerimientos" not in st.session_state:
+    st.session_state.requerimientos = {"kcal_obj": 0.0, "prot_obj": 0.0, "agua_obj": 0.0}
+
+if "diario" not in st.session_state:
+    st.session_state.diario = []  # {hora,nombre,porciones,porcion_desc,kcal,proteina_g,hidr_ml}
+
+# Reset automático si cambia el día
+if st.session_state.fecha != date.today():
+    st.session_state.perfil = None
+    st.session_state.requerimientos = {"kcal_obj": 0.0, "prot_obj": 0.0, "agua_obj": 0.0}
+    st.session_state.diario = []
+    st.session_state.fecha = date.today()
 
 # =========================
-# Cálculos de metas
+# Helpers
 # =========================
-# Objetivos que activan el ajuste de proteína y calorías
-# (incluye variantes para mantener compatibilidad hacia atrás)
-OBJETIVOS_FUERZA = {
-    "Aumentar Masa Muscular",
-    "Mejorar Rendimiento Fisico",
+OBJETIVOS = [
+    "Perder peso",
+    "Tonificar",
     "Aumentar masa muscular",
     "Mejorar rendimiento físico",
-    "Mejorar rendimiento fisico",
-}
+    "Mejorar salud",
+]
 
-def meta_proteina(peso_kg: float, genero: str, objetivos: List[str]) -> float:
-    especial = bool(OBJETIVOS_FUERZA.intersection(set(map(str.strip, objetivos))))
-    if (genero or "").lower().startswith("h"):
-        factor = 2.0 if especial else 1.6
+def es_objetivo_alto(obj: str) -> bool:
+    normal = obj.strip().lower()
+    return normal in {"aumentar masa muscular", "mejorar rendimiento físico", "mejorar rendimiento fisico"}
+
+def calcular_requerimientos(peso_kg: float, altura_cm: float, edad: int, genero: str, objetivo: str):
+    # Proteína
+    if genero == "Hombre":
+        prot = peso_kg * (2.0 if es_objetivo_alto(objetivo) else 1.6)
     else:
-        factor = 1.8 if especial else 1.4
-    return round(peso_kg * factor, 1)
+        prot = peso_kg * (1.8 if es_objetivo_alto(objetivo) else 1.4)
 
-def meta_calorias(peso_kg: float, altura_cm: float, edad: int, genero: str, objetivos: List[str]) -> int:
-    if (genero or "").lower().startswith("h"):
-        bmr = (10*peso_kg) + (6.25*altura_cm) - (5*edad) + 5
-        ajuste = 250 if OBJETIVOS_FUERZA.intersection(objetivos) else -250
+    # Calorías (Mifflin-St Jeor) +/- 250 con piso 1200 cuando aplica
+    if genero == "Hombre":
+        bmr = (10 * peso_kg) + (6.25 * altura_cm) - (5 * edad) + 5
     else:
-        bmr = (10*peso_kg) + (6.25*altura_cm) - (5*edad) - 161
-        ajuste = 250 if OBJETIVOS_FUERZA.intersection(objetivos) else -250
-    req = int(round(bmr + ajuste))
-    return max(req, 1200) if ajuste < 0 else req
+        bmr = (10 * peso_kg) + (6.25 * altura_cm) - (5 * edad) - 161
 
-def meta_agua_ml(peso_kg: float) -> int:
-    return int(round((peso_kg/7.0)*250))
+    if es_objetivo_alto(objetivo):
+        kcal = bmr + 250
+    else:
+        kcal = bmr - 250
+        if kcal < 1200:
+            kcal = 1200
 
-def totales_del_dia(rows: List[Dict]):
-    kcal = sum(r["kcal_tot"] for r in rows if r["tipo"] == "Comida")
-    prot = sum(r["prot_tot"] for r in rows if r["tipo"] == "Comida")  # <-- si usas 'if' en español, cámbialo a if
-    agua = sum(r.get("hidr_tot_ml", 0) for r in rows)
+    agua_ml = (peso_kg / 7.0) * 250.0
+    return round(kcal, 0), round(prot, 1), round(agua_ml, 0)
+
+def totales_diarios():
+    kcal = sum(x["kcal"] for x in st.session_state.diario)
+    prot = sum(x["proteina_g"] for x in st.session_state.diario)
+    agua = sum(x["hidr_ml"] for x in st.session_state.diario)
     return kcal, prot, agua
 
-def numero_color(valor: float, meta: float, tipo: str):
-    color = "green" if (valor <= meta if tipo == "kcal" else valor >= meta) else "red"
-    txt = f"{valor:,.1f}" if isinstance(valor, float) and not float(valor).is_integer() else f"{int(valor):,}"
-    st.markdown(f"<span style='color:{color}; font-weight:700'>{txt}</span>", unsafe_allow_html=True)
-
-def fila_resumen(label: str, consumido: float, meta: float, tipo: str):
-    c1, c2, c3 = st.columns([1,1,1])
-    with c1: st.markdown(f"**{label}**")
-    with c2: numero_color(consumido, meta, tipo)
-    with c3: st.markdown(f"de **{int(meta) if tipo=='kcal' else round(meta,1)}**")
-
-# =========================
-# Estado base
-# =========================
-if "logs" not in st.session_state:
-    st.session_state.logs = {}            # {"YYYY-MM-DD": [registros]}
-if "perfil" not in st.session_state:
-    st.session_state.perfil = {}          # nombre, genero, edad, peso, altura, objetivos
-if "initialized_from_ls" not in st.session_state:
-    st.session_state.initialized_from_ls = False
-if "last_reset" not in st.session_state:
-    st.session_state.last_reset = None    # "YYYY-MM-DD" de la última limpieza
-
-def _key_fecha(d: date) -> str: return d.isoformat()
-def get_logs_del_dia(d: date): return st.session_state.logs.get(_key_fecha(d), [])
-def set_logs_del_dia(d: date, rows): st.session_state.logs[_key_fecha(d)] = rows
-
-# =========================
-# Helpers JS para LocalStorage y fecha local del dispositivo
-# =========================
-def ls_get(key: str) -> str:
-    return components.html(f"""
-    <script>
-      const v = window.localStorage.getItem("{key}") ?? "";
-      Streamlit.setComponentValue(v);
-    </script>
-    """, height=0)
-
-def ls_set(key: str, value: str):
-    components.html(f"""
-    <script>
-      try {{ window.localStorage.setItem("{key}", {json.dumps(value)}); }}
-      catch (e) {{ console.warn("localStorage set failed", e); }}
-    </script>
-    """, height=0)
-
-def get_client_ymd() -> str:
-    """Devuelve 'YYYY-MM-DD' según la hora LOCAL del dispositivo."""
-    return components.html("""
-    <script>
-      const d = new Date();
-      const y = d.getFullYear();
-      const m = String(d.getMonth()+1).padStart(2,'0');
-      const da = String(d.getDate()).padStart(2,'0');
-      Streamlit.setComponentValue(`${y}-${m}-${da}`);
-    </script>
-    """, height=0)
-
-# =========================
-# Cargar desde localStorage + auto-reset por día
-# =========================
-if not st.session_state.initialized_from_ls:
-    # 1) Carga data (perfil + logs)
-    raw = ls_get(LS_DATA_KEY)
-    try:
-        if isinstance(raw, str) and raw.strip():
-            payload = json.loads(raw)
-            if isinstance(payload.get("perfil"), dict):
-                st.session_state.perfil = payload["perfil"]
-            if isinstance(payload.get("logs"), dict):
-                st.session_state.logs = payload["logs"]
-    except Exception:
-        pass
-
-    # 2) Carga meta (last_reset)
-    raw_meta = ls_get(LS_META_KEY)
-    meta_obj = {}
-    try:
-        if isinstance(raw_meta, str) and raw_meta.strip():
-            meta_obj = json.loads(raw_meta)
-    except Exception:
-        meta_obj = {}
-
-    # 3) Fecha local del dispositivo
-    client_ymd = get_client_ymd()
-    if not isinstance(client_ymd, str) or not client_ymd.strip():
-        client_ymd = date.today().isoformat()  # fallback por si algo falla
-
-    last_reset = (meta_obj.get("last_reset") if isinstance(meta_obj, dict) else None)
-
-    # 4) Si cambió el día → limpiar SOLO logs
-    if last_reset != client_ymd:
-        st.session_state.logs = {}  # limpiar registros diarios
-        st.session_state.last_reset = client_ymd
-        # Persistir meta actualizada
-        try:
-            ls_set(LS_META_KEY, json.dumps({"last_reset": client_ymd}))
-        except Exception:
-            pass
+def etiqueta_color(valor: float, objetivo: float, regla: str) -> str:
+    if objetivo <= 0:
+        return "⚪"
+    if regla == "menor_mejor":
+        return "🟢" if valor <= objetivo else "🔴"
     else:
-        st.session_state.last_reset = last_reset
+        return "🟢" if valor >= objetivo else "🔴"
 
-    st.session_state.initialized_from_ls = True
+def agregar_fila(nombre: str, porciones: float, item: Dict|None, hidr_ml_override: float | None = None):
+    ahora = datetime.now().strftime(HORA_FMT)
+    kcal = (item["kcal"] * porciones) if item else 0.0
+    prot = (item["proteina_g"] * porciones) if item else 0.0
+    hidr = (item["hidr_ml"] * porciones) if item else 0.0
+    if hidr_ml_override is not None:
+        hidr = float(hidr_ml_override)
+    st.session_state.diario.append({
+        "hora": ahora,
+        "nombre": nombre,
+        "porciones": porciones,
+        "porcion_desc": (item["porcion_desc"] if item else f"{int(hidr)} ml"),
+        "kcal": round(kcal, 1),
+        "proteina_g": round(prot, 1),
+        "hidr_ml": round(hidr, 0),
+    })
 
-# =========================
-# Header + modo móvil con query param estable
-# =========================
-st.markdown("### 📒 Diario de Comidas")
-
-qp = st.query_params
-arrancar_movil = str(qp.get("movil", "0")).lower() in ("1", "true", "yes", "y")
-
-if "modo_movil" not in st.session_state:
-    st.session_state.modo_movil = arrancar_movil
-
-modo_movil = st.toggle("📱 Modo compacto (móvil)", value=st.session_state.modo_movil,
-                       help="Optimiza controles para pantallas chicas")
-st.session_state.modo_movil = modo_movil
-
-# sincroniza URL
-if modo_movil:
-    st.query_params["movil"] = "1"
-else:
-    if "movil" in st.query_params:
-        del st.query_params["movil"]
-
-container_btn_class = "fullwidth" if modo_movil else ""
+def construir_df_diario() -> pd.DataFrame:
+    if not st.session_state.diario:
+        return pd.DataFrame(columns=["hora","nombre","porciones","porcion_desc","kcal","proteina_g","hidr_ml"])
+    return pd.DataFrame(st.session_state.diario)
 
 # =========================
-# Inputs del usuario (usa perfil guardado si existe)
+# UI - Título
 # =========================
-def ui_datos():
-    pf = st.session_state.perfil or {}
-    nombre = st.text_input("Nombre", pf.get("nombre", ""))
-    genero = st.selectbox("Género", ["Hombre", "Mujer"], index=(0 if pf.get("genero","Hombre")=="Hombre" else 1))
-    edad = st.number_input("Edad (años)", min_value=10, max_value=100, value=int(pf.get("edad", 30)), step=1)
-    peso = st.number_input("Peso (kg)", min_value=20.0, max_value=300.0,
-                           value=float(pf.get("peso", 70.0)), step=0.5, format="%.1f")
-    altura = st.number_input("Altura (cm)", min_value=120.0, max_value=230.0,
-                             value=float(pf.get("altura", 170.0)), step=0.5, format="%.1f")
-    objetivos = st.multiselect(
-        "Objetivo(s)",
-        [
-            "Perder Peso",
-            "Tonificar / Bajar Grasa",
-            "Aumentar Masa Muscular",
-            "Aumentar Energia",
-            "Mejorar Rendimiento Fisico",
-            "Mejorar Salud",
-        ],
-        default=pf.get("objetivos", []),
+st.title("📒 Diario de Comidas")
+
+# =========================
+# 1) Perfil y requerimientos
+# =========================
+with st.expander("1) Datos de la persona y requerimientos", expanded=True):
+    with st.form("form_perfil"):
+        col1, col2, col3, col4, col5 = st.columns([1,1,1,1,1])
+        with col1:
+            peso = st.number_input("Peso (kg)", min_value=20.0, max_value=300.0, step=0.5, value=70.0)
+        with col2:
+            altura = st.number_input("Altura (cm)", min_value=120.0, max_value=220.0, step=0.5, value=170.0,
+                                     help="Necesaria para el cálculo de calorías (Mifflin-St Jeor).")
+        with col3:
+            edad = st.number_input("Edad (años)", min_value=10, max_value=100, step=1, value=30)
+        with col4:
+            genero = st.selectbox("Género", ["Hombre", "Mujer"])
+        with col5:
+            objetivo = st.selectbox("Objetivo", OBJETIVOS)
+
+        submit = st.form_submit_button("Calcular requerimientos")
+        if submit:
+            kcal_obj, prot_obj, agua_obj = calcular_requerimientos(peso, altura, edad, genero, objetivo)
+            st.session_state.perfil = {
+                "peso_kg": peso, "altura_cm": altura, "edad": edad, "genero": genero, "objetivo": objetivo
+            }
+            st.session_state.requerimientos = {
+                "kcal_obj": float(kcal_obj),
+                "prot_obj": float(prot_obj),
+                "agua_obj": float(agua_obj),
+            }
+
+    if st.session_state.perfil:
+        c1, c2, c3, c4, c5 = st.columns(5)
+        with c1:
+            st.metric("🎯 Calorías objetivo", f"{st.session_state.requerimientos['kcal_obj']:.0f} kcal")
+        with c2:
+            st.metric("🎯 Proteína objetivo", f"{st.session_state.requerimientos['prot_obj']:.1f} g")
+        with c3:
+            st.metric("🎯 Hidratación objetivo", f"{st.session_state.requerimientos['agua_obj']:.0f} ml")
+        with c4:
+            st.write(" ")
+        with c5:
+            if st.button("🔄 Reiniciar día", use_container_width=True, type="secondary"):
+                st.session_state.diario = []
+                st.session_state.fecha = date.today()
+
+# =========================
+# 2) Barras de progreso
+# =========================
+if st.session_state.perfil:
+    kcal_tot, prot_tot, agua_tot = totales_diarios()
+    kcal_obj = st.session_state.requerimientos["kcal_obj"]
+    prot_obj = st.session_state.requerimientos["prot_obj"]
+    agua_obj = st.session_state.requerimientos["agua_obj"]
+
+    st.subheader("Progreso del día")
+    pc1, pc2, pc3 = st.columns(3)
+
+    with pc1:
+        ratio = min(1.0, (kcal_tot / kcal_obj) if kcal_obj > 0 else 0.0)
+        st.progress(ratio, text=f"Calorías: {kcal_tot:.0f}/{kcal_obj:.0f} kcal ({ratio*100:.0f}%)")
+        etiqueta = etiqueta_color(kcal_tot, kcal_obj, "menor_mejor")
+        st.markdown(f"**Estado:** {etiqueta}")
+
+    with pc2:
+        ratio = min(1.0, (prot_tot / prot_obj) if prot_obj > 0 else 0.0)
+        st.progress(ratio, text=f"Proteína: {prot_tot:.1f}/{prot_obj:.1f} g ({ratio*100:.0f}%)")
+        etiqueta = etiqueta_color(prot_tot, prot_obj, "mayor_mejor")
+        st.markdown(f"**Estado:** {etiqueta}")
+
+    with pc3:
+        ratio = min(1.0, (agua_tot / agua_obj) if agua_obj > 0 else 0.0)
+        st.progress(ratio, text=f"Hidratación: {agua_tot:.0f}/{agua_obj:.0f} ml ({ratio*100:.0f}%)")
+        etiqueta = etiqueta_color(agua_tot, agua_obj, "mayor_mejor")
+        st.markdown(f"**Estado:** {etiqueta}")
+
+# =========================
+# 3) Registro de comidas (solo select + porciones)
+# =========================
+st.subheader("Registro de comidas")
+
+# Opciones directamente desde BASE_INTERNA
+def etiqueta_item(it: Dict) -> str:
+    return f"{it['nombre']} — {it['porcion_desc']} · {it['kcal']} kcal · {it['proteina_g']} g prot"
+
+lista_items = BASE_INTERNA[:]  # mantener orden provisto
+labels = [etiqueta_item(it) for it in lista_items]
+
+with st.form("form_comida", clear_on_submit=True):
+    col_a, col_b, col_c = st.columns([3,1,1])
+    with col_a:
+        sel_label = st.selectbox("Elige un alimento/bebida", labels)
+        idx = labels.index(sel_label)
+        item = lista_items[idx]
+        st.caption(f"Porción base: **{item['porcion_desc']}**")
+    with col_b:
+        porciones = st.number_input("Cant. porciones", min_value=0.25, max_value=20.0, step=0.25, value=1.0)
+    with col_c:
+        st.write(" ")
+        add_food = st.form_submit_button("➕ Agregar", use_container_width=True)
+
+    if add_food and item:
+        agregar_fila(nombre=item["nombre"], porciones=porciones, item=item)
+
+# Registro rápido de agua
+with st.form("form_agua", clear_on_submit=True):
+    colx, coly = st.columns([2,1])
+    with colx:
+        agua_ml_in = st.number_input("Registrar agua (ml)", min_value=0, max_value=5000, step=50, value=0)
+    with coly:
+        st.write(" ")
+        add_agua = st.form_submit_button("💧 Agregar agua", use_container_width=True)
+    if add_agua and agua_ml_in > 0:
+        agregar_fila(nombre="Agua (ml)", porciones=1.0, item=None, hidr_ml_override=agua_ml_in)
+
+# =========================
+# 4) Tabla del día y acciones
+# =========================
+df = construir_df_diario()
+st.dataframe(df, use_container_width=True, hide_index=True)
+
+col_btn1, col_btn2, _ = st.columns([1,1,2])
+with col_btn1:
+    if st.button("↩️ Eliminar última fila", use_container_width=True, type="secondary", disabled=df.empty):
+        if st.session_state.diario:
+            st.session_state.diario.pop()
+with col_btn2:
+    if st.button("🗑️ Vaciar diario", use_container_width=True, type="secondary", disabled=df.empty):
+        st.session_state.diario = []
+
+# =========================
+# 5) Resumen + Exportar
+# =========================
+if st.session_state.perfil:
+    kcal_tot, prot_tot, agua_tot = totales_diarios()
+    kcal_obj = st.session_state.requerimientos["kcal_obj"]
+    prot_obj = st.session_state.requerimientos["prot_obj"]
+    agua_obj = st.session_state.requerimientos["agua_obj"]
+
+    st.markdown("---")
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        et = etiqueta_color(kcal_tot, kcal_obj, "menor_mejor")
+        st.markdown(f"### Calorías\n**{kcal_tot:.0f} / {kcal_obj:.0f} kcal** {et}")
+    with c2:
+        et = etiqueta_color(prot_tot, prot_obj, "mayor_mejor")
+        st.markdown(f"### Proteína\n**{prot_tot:.1f} / {prot_obj:.1f} g** {et}")
+    with c3:
+        et = etiqueta_color(agua_tot, agua_obj, "mayor_mejor")
+        st.markdown(f"### Hidratación\n**{agua_tot:.0f} / {agua_obj:.0f} ml** {et}")
+
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
+        df_export = construir_df_diario()
+        df_export.to_excel(writer, index=False, sheet_name="Diario")
+
+        resumen = pd.DataFrame({
+            "Métrica": ["Calorías (kcal)", "Proteína (g)", "Hidratación (ml)"],
+            "Total del día": [round(kcal_tot,0), round(prot_tot,1), round(agua_tot,0)],
+            "Objetivo": [round(kcal_obj,0), round(prot_obj,1), round(agua_obj,0)],
+        })
+        perfil = pd.DataFrame([{
+            "Peso (kg)": st.session_state.perfil["peso_kg"],
+            "Altura (cm)": st.session_state.perfil["altura_cm"],
+            "Edad": st.session_state.perfil["edad"],
+            "Género": st.session_state.perfil["genero"],
+            "Objetivo": st.session_state.perfil["objetivo"],
+            "Fecha": st.session_state.fecha.strftime("%Y-%m-%d"),
+        }])
+        resumen.to_excel(writer, index=False, sheet_name="Resumen")
+        ws = writer.sheets["Resumen"]
+        start_row = len(resumen) + 2
+        for col_idx, col_name in enumerate(perfil.columns):
+            ws.write(start_row, col_idx, col_name)
+        for row_idx in range(len(perfil)):
+            for col_idx, col_name in enumerate(perfil.columns):
+                ws.write(start_row + 1 + row_idx, col_idx, perfil.iloc[row_idx][col_name])
+
+    st.download_button(
+        label="📥 Exportar Diario (Excel)",
+        data=buffer.getvalue(),
+        file_name=f"diario_comidas_{st.session_state.fecha.isoformat()}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        use_container_width=True
     )
-    
-    st.session_state.perfil = {
-        "nombre": nombre, "genero": genero, "edad": int(edad),
-        "peso": float(peso), "altura": float(altura), "objetivos": objetivos
-    }
-    return nombre, genero, edad, peso, altura, objetivos
-
-if modo_movil:
-    with st.expander("🧍 Datos de la persona", expanded=True):
-        nombre, genero, edad, peso, altura, objetivos = ui_datos()
 else:
-    with st.sidebar:
-        st.header("🧍 Datos de la persona")
-        nombre, genero, edad, peso, altura, objetivos = ui_datos()
-
-# =========================
-# Fecha + metas
-# =========================
-cfecha, _ = st.columns([1,3])
-with cfecha:
-    fecha_sel = st.date_input("📅 Fecha del diario", value=date.today())
-
-meta_prot = meta_proteina(peso, genero, objetivos)
-meta_cal  = meta_calorias(peso, altura, edad, genero, objetivos)
-meta_h2o  = meta_agua_ml(peso)
-
-# =========================
-# Progreso
-# =========================
-def totales_del_dia(rows: List[Dict]):
-    kcal = sum(r["kcal_tot"] for r in rows if r["tipo"] == "Comida")
-    prot = sum(r["prot_tot"] for r in rows if r["tipo"] == "Comida")
-    agua = sum(r.get("hidr_tot_ml", 0) for r in rows)
-    return kcal, prot, agua
-
-logs_hoy = get_logs_del_dia(fecha_sel)
-kcal_tot, prot_tot, agua_tot_ml = totales_del_dia(logs_hoy)
-
-st.subheader("Progreso del día")
-p1, p2, p3 = st.columns(3)
-with p1:
-    st.markdown("**Calorías**")
-    st.progress(min(kcal_tot/max(meta_cal,1), 1.0), text=f"{kcal_tot} / {meta_cal} kcal")
-with p2:
-    st.markdown("**Proteína**")
-    st.progress(min(prot_tot/max(meta_prot,1e-9), 1.0), text=f"{prot_tot:.1f} / {meta_prot:.1f} g")
-with p3:
-    st.markdown("**Hidratación**")
-    st.progress(min(agua_tot_ml/max(meta_h2o,1), 1.0), text=f"{agua_tot_ml} / {meta_h2o} ml")
-
-st.divider()
-
-# =========================
-# Tabs
-# =========================
-tab_agregar, tab_resumen, tab_base = st.tabs(["➕ Agregar registro", "📊 Resumen del día", "🍽️ Base de alimentos"])
-
-with tab_agregar:
-    tipo_reg = st.radio("Tipo de registro", ["Comida", "Hidratación"], horizontal=not modo_movil)
-
-    if tipo_reg == "Comida":
-        opciones = alimentos_df.copy()
-        opciones["etiqueta"] = opciones.apply(
-            lambda r: f'{r["nombre"]} · {r["porcion_desc"]} ({int(r["kcal"])} kcal, {r["proteina_g"]:.1f} g prot)', axis=1
-        )
-        seleccion = st.selectbox(
-            "Buscar y elegir alimento (escribe para filtrar)",
-            options=opciones.index.tolist(),
-            format_func=lambda i: opciones.loc[i, "etiqueta"],
-            index=None,
-            placeholder="pollo, arroz, yogurt…"
-        )
-        porciones = st.number_input("Porciones", min_value=0.25, max_value=10.0, value=1.0, step=0.25)
-
-        st.markdown(f'<div class="{container_btn_class}">', unsafe_allow_html=True)
-        add = st.button("Agregar comida", type="primary", disabled=(seleccion is None), use_container_width=modo_movil)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        if add and seleccion is not None:
-            row = opciones.loc[seleccion]
-            nuevo = {
-                "hora": datetime.now().strftime(HORA_FMT),
-                "tipo": "Comida",
-                "alimento": row["nombre"],
-                "porcion": row["porcion_desc"],
-                "porciones": porciones,
-                "kcal_unit": float(row["kcal"]),
-                "prot_unit": float(row["proteina_g"]),
-                "hidr_unit_ml": float(row.get("hidr_ml", 0) or 0),
-                "kcal_tot": float(row["kcal"]) * porciones,
-                "prot_tot": float(row["proteina_g"]) * porciones,
-                "hidr_tot_ml": float(row.get("hidr_ml", 0) or 0) * porciones,
-            }
-            rows = get_logs_del_dia(fecha_sel)
-            rows.append(nuevo)
-            set_logs_del_dia(fecha_sel, rows)
-            st.success("Comida agregada ✅")
-
-    else:
-        ml = st.number_input("Mililitros (ml)", min_value=50, max_value=3000, value=250, step=50)
-        detalle = st.text_input("Detalle (opcional)", "Agua")
-
-        st.markdown(f'<div class="{container_btn_class}">', unsafe_allow_html=True)
-        addw = st.button("Agregar hidratación", type="primary", use_container_width=modo_movil)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        if addw:
-            nuevo = {
-                "hora": datetime.now().strftime(HORA_FMT),
-                "tipo": "Hidratación",
-                "alimento": detalle,
-                "porcion": f"{ml} ml",
-                "porciones": 1.0,
-                "kcal_unit": 0.0,
-                "prot_unit": 0.0,
-                "hidr_unit_ml": float(ml),
-                "kcal_tot": 0.0,
-                "prot_tot": 0.0,
-                "hidr_tot_ml": float(ml),
-            }
-            rows = get_logs_del_dia(fecha_sel)
-            rows.append(nuevo)
-            set_logs_del_dia(fecha_sel, rows)
-            st.success("Hidratación agregada 💧")
-
-with tab_resumen:
-    rows = get_logs_del_dia(fecha_sel)
-    if not rows:
-        st.info("Aún no hay registros en esta fecha.")
-    else:
-        df = pd.DataFrame(rows)
-        df_view = df[["hora","tipo","alimento","porcion","porciones","kcal_tot","prot_tot","hidr_tot_ml"]].copy()
-        df_view.columns = ["Hora","Tipo","Alimento","Porción","Porciones","Kcal","Proteína (g)","Hidratación (ml)"]
-        st.dataframe(df_view, use_container_width=True, height=360)
-
-        kcal_tot, prot_tot, agua_tot_ml = totales_del_dia(rows)
-        st.subheader("Totales")
-        c1, c2, c3 = st.columns(3)
-        with c1: fila_resumen("Calorías", kcal_tot, meta_cal, "kcal")
-        with c2: fila_resumen("Proteína (g)", prot_tot, meta_prot, "prot")
-        with c3: fila_resumen("Hidratación (ml)", agua_tot_ml, meta_h2o, "agua")
-
-        st.divider()
-        cdel1, cdel2 = st.columns(2)
-        with cdel1:
-            st.markdown(f'<div class="{container_btn_class}">', unsafe_allow_html=True)
-            if st.button("🗑️ Borrar último", use_container_width=modo_movil):
-                rows.pop()
-                set_logs_del_dia(fecha_sel, rows)
-                st.warning("Se borró el último registro.")
-            st.markdown('</div>', unsafe_allow_html=True)
-        with cdel2:
-            st.markdown(f'<div class="{container_btn_class}">', unsafe_allow_html=True)
-            if st.button("🗑️ Vaciar día", use_container_width=modo_movil):
-                set_logs_del_dia(fecha_sel, [])
-                st.warning("Se vaciaron los registros del día.")
-            st.markdown('</div>', unsafe_allow_html=True)
-
-with tab_base:
-    st.markdown("**Base de alimentos (incrustada)**")
-    st.dataframe(alimentos_df, use_container_width=True, height=420)
-    st.success(f"Alimentos cargados: {len(alimentos_df)}")
-
-# =========================
-# Persistencia en localStorage (guardar al final de cada ejecución)
-# =========================
-try:
-    payload = {"perfil": st.session_state.perfil, "logs": st.session_state.logs}
-    components.html(f"""
-    <script>
-      try {{
-        window.localStorage.setItem("{LS_DATA_KEY}", {json.dumps(json.dumps(payload, ensure_ascii=False))});
-        // Asegura que meta tenga last_reset actual (si ya lo definimos arriba)
-        const metaRaw = window.localStorage.getItem("{LS_META_KEY}");
-        let meta = metaRaw ? JSON.parse(metaRaw) : {{}};
-        if (!meta.last_reset && "{st.session_state.last_reset or ''}") {{
-          meta.last_reset = "{st.session_state.last_reset or ''}";
-          window.localStorage.setItem("{LS_META_KEY}", JSON.stringify(meta));
-        }}
-      }} catch (e) {{ console.warn("localStorage set failed", e); }}
-    </script>
-    """, height=0)
-except Exception:
-    pass
-
+    st.info("Primero completa tus datos y calcula tus requerimientos para activar el seguimiento y la exportación.")
