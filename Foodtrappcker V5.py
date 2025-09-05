@@ -1207,7 +1207,7 @@ if not st.session_state.initialized_from_ls:
 # =========================
 # Header + modo móvil con query param estable
 # =========================
-st.title("Diario de Comidas")
+st.markdown("### 📒 Diario de Comidas")
 
 qp = st.query_params
 arrancar_movil = str(qp.get("movil", "0")).lower() in ("1", "true", "yes", "y")
