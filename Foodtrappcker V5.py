@@ -420,7 +420,7 @@ BASE_INTERNA: List[Dict] = [
   },
   {
     "nombre": "Camote (Cocido)",
-    "porcion_desc": "150g",
+    "porcion_desc": "1 unidad (150g)",
     "kcal": 135.0,
     "proteina_g": 2.0,
     "hidr_ml": 0
