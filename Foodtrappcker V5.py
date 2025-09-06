@@ -713,45 +713,73 @@ BASE_INTERNA: List[Dict] = [
     "hidr_ml": 0
   },
   {
-    "nombre": "Arroz Chaufa (Carta)",
-    "porcion_desc": "1 plato (250g)",
-    "kcal": 520.0,
-    "proteina_g": 22.0,
-    "hidr_ml": 0
-  },
-  {
     "nombre": "Chaufa de Pollo (Carta)",
-    "porcion_desc": "1 plato (250g)",
-    "kcal": 520.0,
+    "porcion_desc": "1 plato",
+    "kcal": 750.0,
     "proteina_g": 32.0,
     "hidr_ml": 0
   },
   {
+    "nombre": "Chaufa de Pollo (Menu)",
+    "porcion_desc": "1 plato",
+    "kcal": 420.0,
+    "proteina_g": 18.0,
+    "hidr_ml": 0
+  },
+  {
     "nombre": "Chaufa Especial (Menu)",
-    "porcion_desc": "1 plato (250g)",
-    "kcal": 600.0,
+    "porcion_desc": "1 plato",
+    "kcal": 480.0,
     "proteina_g": 22.0,
     "hidr_ml": 0
   },
   {
-    "nombre": "Arroz Aeroporto (Menu)",
-    "porcion_desc": "1 plato (250g)",
+    "nombre": "Chaufa Especial (Carta)",
+    "porcion_desc": "1 plato",
+    "kcal": 850.0,
+    "proteina_g": 40.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Arroz Aeropuerto (Menu)",
+    "porcion_desc": "1 plato",
     "kcal": 600.0,
-    "proteina_g": 22.0,
+    "proteina_g": 20.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Arroz Aeropuerto (Carta)",
+    "porcion_desc": "1 plato",
+    "kcal": 1100.0,
+    "proteina_g": 38.0,
     "hidr_ml": 0
   },
   {
     "nombre": "Tallarín Saltado de Pollo (Menu)",
-    "porcion_desc": "1 plato (250g)",
-    "kcal": 540.0,
-    "proteina_g": 24.0,
+    "porcion_desc": "1 plato",
+    "kcal": 400.0,
+    "proteina_g": 16.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Tallarín Saltado de Pollo (Carta)",
+    "porcion_desc": "1 plato",
+    "kcal": 700.0,
+    "proteina_g": 30.0,
     "hidr_ml": 0
   },
   {
     "nombre": "Tallarín Taypa (Menu)",
-    "porcion_desc": "1 plato (250g)",
-    "kcal": 620.0,
-    "proteina_g": 26.0,
+    "porcion_desc": "1 plato",
+    "kcal": 500.0,
+    "proteina_g": 23.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Tallarín Taypa (Carta)",
+    "porcion_desc": "1 plato",
+    "kcal": 900.0,
+    "proteina_g": 42.0,
     "hidr_ml": 0
   },
   {
@@ -762,45 +790,101 @@ BASE_INTERNA: List[Dict] = [
     "hidr_ml": 0
   },
   {
-    "nombre": "Pollo con Kion (Menu)",
-    "porcion_desc": "1 plato (250g)",
-    "kcal": 410.0,
-    "proteina_g": 28.0,
+    "nombre": "Pollo Chi Jau Kay (Menu)",
+    "porcion_desc": "1 plato",
+    "kcal": 400.0,
+    "proteina_g": 26.0,
     "hidr_ml": 0
   },
   {
-    "nombre": "Chanchito con tamarindo (Menu)",
-    "porcion_desc": "1 plato (250g)",
-    "kcal": 600.0,
-    "proteina_g": 22.0,
+    "nombre": "Pollo Chi Jau Kay (Carta)",
+    "porcion_desc": "1 plato",
+    "kcal": 800.0,
+    "proteina_g": 45.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Pollo TiPaKay (Menu)",
+    "porcion_desc": "1 plato",
+    "kcal": 420.0,
+    "proteina_g": 25.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Pollo TiPaKay (Carta)",
+    "porcion_desc": "1 plato",
+    "kcal": 850.0,
+    "proteina_g": 42.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Chancho con tamarindo (Menu)",
+    "porcion_desc": "1 plato",
+    "kcal": 410.0,
+    "proteina_g": 23.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Chancho con tamarindo (Carta)",
+    "porcion_desc": "1 plato",
+    "kcal": 780.0,
+    "proteina_g": 38.0,
     "hidr_ml": 0
   },
   {
     "nombre": "Pollo Enrollado (Menu)",
-    "porcion_desc": "1 plato (250g)",
+    "porcion_desc": "1 plato",
     "kcal": 450.0,
-    "proteina_g": 36.0,
+    "proteina_g": 30.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Pollo Enrollado (Carta)",
+    "porcion_desc": "1 plato",
+    "kcal": 650.0,
+    "proteina_g": 45.0,
     "hidr_ml": 0
   },
   {
     "nombre": "Lomo en Ostión (Menu)",
-    "porcion_desc": "1 plato (250g)",
-    "kcal": 430.0,
-    "proteina_g": 32.0,
+    "porcion_desc": "1 plato",
+    "kcal": 380.0,
+    "proteina_g": 25.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Lomo en Ostión (Carta)",
+    "porcion_desc": "1 plato",
+    "kcal": 720.0,
+    "proteina_g": 40.0,
     "hidr_ml": 0
   },
   {
     "nombre": "Sopa Wantan (Menu)",
-    "porcion_desc": "1 plato (250g)",
-    "kcal": 300.0,
-    "proteina_g": 16.0,
+    "porcion_desc": "1 plato",
+    "kcal": 130.0,
+    "proteina_g": 6.0,
     "hidr_ml": 0
   },
   {
-    "nombre": "Ceviche (Composición)",
-    "porcion_desc": "1 plato (250g)",
-    "kcal": 400.0,
-    "proteina_g": 36.0,
+    "nombre": "Sopa Wantan (Carta)",
+    "porcion_desc": "1 plato",
+    "kcal": 250.0,
+    "proteina_g": 12.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Ceviche (Completo)",
+    "porcion_desc": "1 plato",
+    "kcal": 450.0,
+    "proteina_g": 38.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Ceviche (Sin Guarniciones)",
+    "porcion_desc": "1 plato",
+    "kcal": 200.0,
+    "proteina_g": 35.0,
     "hidr_ml": 0
   },
   {
@@ -1020,6 +1104,20 @@ BASE_INTERNA: List[Dict] = [
     "proteina_g": 0.5,
     "hidr_ml": 0
   }
+  {
+    "nombre": "Wantan Frito",
+    "porcion_desc": "1 unidad",
+    "kcal": 45.0,
+    "proteina_g": 1.2,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Siu Mai",
+    "porcion_desc": "1 unidad",
+    "kcal": 45.0,
+    "proteina_g": 2.5,
+    "hidr_ml": 0
+  },
 ]
 
 # =========================
