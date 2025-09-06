@@ -162,8 +162,8 @@ BASE_INTERNA: List[Dict] = [
   {
     "nombre": "Batido Nutricional",
     "porcion_desc": "1 scoop",
-    "kcal": 90.0,
-    "proteina_g": 9.0,
+    "kcal": 45.0,
+    "proteina_g": 4.5,
     "hidr_ml": 0
   },
   {
