@@ -1103,7 +1103,7 @@ BASE_INTERNA: List[Dict] = [
     "kcal": 15.0,
     "proteina_g": 0.5,
     "hidr_ml": 0
-  }
+  },
   {
     "nombre": "Wantan Frito",
     "porcion_desc": "1 unidad",
