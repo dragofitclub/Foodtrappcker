@@ -755,6 +755,13 @@ BASE_INTERNA: List[Dict] = [
     "hidr_ml": 0
   },
   {
+    "nombre": "Juane",
+    "porcion_desc": "1 unidad",
+    "kcal": 407.0,
+    "proteina_g": 20.0,
+    "hidr_ml": 0
+  },
+  {
     "nombre": "Pollo con Kion (Menu)",
     "porcion_desc": "1 plato (250g)",
     "kcal": 410.0,
@@ -931,16 +938,16 @@ BASE_INTERNA: List[Dict] = [
   },
   {
     "nombre": "Pollo a la brasa (1/4 sin guarnición)",
-    "porcion_desc": "200g",
+    "porcion_desc": "1 unidad",
     "kcal": 350.0,
-    "proteina_g": 58.0,
+    "proteina_g": 20.0,
     "hidr_ml": 0
   },
   {
     "nombre": "Pollo a la brasa 1/4 (completo)",
     "porcion_desc": "1 unidad",
     "kcal": 1500.0,
-    "proteina_g": 120.0,
+    "proteina_g": 20.0,
     "hidr_ml": 0
   },
   {
@@ -1235,6 +1242,7 @@ with st.form("form_comida", clear_on_submit=True):
 
     if add_food and item:
         agregar_fila(nombre=item["nombre"], porciones=porciones, item=item)
+        st.rerun()  # <-- fuerza actualización inmediata
 
 # Registro rápido de agua
 with st.form("form_agua", clear_on_submit=True):
@@ -1246,21 +1254,49 @@ with st.form("form_agua", clear_on_submit=True):
         add_agua = st.form_submit_button("💧 Agregar agua", use_container_width=True)
     if add_agua and agua_ml_in > 0:
         agregar_fila(nombre="Agua (ml)", porciones=1.0, item=None, hidr_ml_override=agua_ml_in)
+        st.rerun()  # <-- fuerza actualización inmediata
 
 # =========================
-# 4) Tabla del día y acciones
+# 4) Tabla del día y acciones (selección de filas)
 # =========================
 df = construir_df_diario()
-st.dataframe(df, use_container_width=True, hide_index=True)
+
+sel_rows = []
+if not df.empty:
+    df_display = df.copy()
+    df_display.insert(0, "Seleccionar", False)
+
+    edited = st.data_editor(
+        df_display,
+        use_container_width=True,
+        hide_index=True,
+        disabled={
+            "hora": True,
+            "nombre": True,
+            "porciones": True,
+            "porcion_desc": True,
+            "kcal": True,
+            "proteina_g": True,
+            "hidr_ml": True,
+        },
+        key="editor_diario"
+    )
+    sel_rows = edited.index[edited["Seleccionar"] == True].tolist()
+else:
+    st.dataframe(df, use_container_width=True, hide_index=True)
 
 col_btn1, col_btn2, _ = st.columns([1,1,2])
 with col_btn1:
-    if st.button("↩️ Eliminar última fila", use_container_width=True, type="secondary", disabled=df.empty):
-        if st.session_state.diario:
-            st.session_state.diario.pop()
+    if st.button("🗑️ Eliminar fila seleccionada", use_container_width=True, type="secondary", disabled=(len(sel_rows)==0)):
+        for i in sorted(sel_rows, reverse=True):
+            if 0 <= i < len(st.session_state.diario):
+                st.session_state.diario.pop(i)
+        st.rerun()
+
 with col_btn2:
     if st.button("🗑️ Vaciar diario", use_container_width=True, type="secondary", disabled=df.empty):
         st.session_state.diario = []
+        st.rerun()
 
 # =========================
 # 5) Resumen + Exportar (número acumulado coloreado)
@@ -1341,7 +1377,7 @@ if st.session_state.perfil:
                     ws.cell(row=start_row+1, column=j, value=col_name)
                 for r in range(len(perfil)):
                     for j, col_name in enumerate(perfil.columns, start=1):
-                        ws.cell(row=start_row+1+1+r, column=j, value=perfil.iloc[r][col_name])
+                        ws.cell(row=start_row+2+r, column=j, value=perfil.iloc[r][col_name])
 
         st.download_button(
             label="📥 Exportar Diario (Excel)",
