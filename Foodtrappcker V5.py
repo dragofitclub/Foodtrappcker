@@ -1118,6 +1118,13 @@ BASE_INTERNA: List[Dict] = [
     "proteina_g": 2.5,
     "hidr_ml": 0
   },
+  {
+    "nombre": "Palta",
+    "porcion_desc": "1 unidad (200g)",
+    "kcal": 200.0,
+    "proteina_g": 2.5,
+    "hidr_ml": 0
+  },
 ]
 
 # =========================
