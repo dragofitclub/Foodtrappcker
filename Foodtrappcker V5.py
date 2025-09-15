@@ -1125,6 +1125,13 @@ BASE_INTERNA: List[Dict] = [
     "proteina_g": 2.5,
     "hidr_ml": 0
   },
+  {
+    "nombre": "Tamal",
+    "porcion_desc": "1 unidad (200g)",
+    "kcal": 400.0,
+    "proteina_g": 10.0,
+    "hidr_ml": 0
+  },
 ]
 
 # =========================
