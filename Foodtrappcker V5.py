@@ -1181,6 +1181,20 @@ BASE_INTERNA: List[Dict] = [
     "proteina_g": 5.0,
     "hidr_ml": 0
   },
+  {
+    "nombre": "Yuca sancochada",
+    "porcion_desc": "1 unidad (100g)",
+    "kcal": 120.0,
+    "proteina_g": 1.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Yuca frita",
+    "porcion_desc": "1 unidad (100g)",
+    "kcal": 250.0,
+    "proteina_g": 1.0,
+    "hidr_ml": 0
+  },
 ]
 
 # =========================
