@@ -1195,6 +1195,20 @@ BASE_INTERNA: List[Dict] = [
     "proteina_g": 1.0,
     "hidr_ml": 0
   },
+  {
+    "nombre": "Jamon de cerdo",
+    "porcion_desc": "1 tajada (15g)",
+    "kcal": 25.0,
+    "proteina_g": 2.5,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Jamon de Pavo",
+    "porcion_desc": "1 tajada (15g)",
+    "kcal": 15.0,
+    "proteina_g": 2.5,
+    "hidr_ml": 0
+  },
 ]
 
 # =========================
