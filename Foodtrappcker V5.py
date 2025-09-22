@@ -1132,6 +1132,48 @@ BASE_INTERNA: List[Dict] = [
     "proteina_g": 10.0,
     "hidr_ml": 0
   },
+  {
+    "nombre": "Arroz con pato",
+    "porcion_desc": "1 plato",
+    "kcal": 850.0,
+    "proteina_g": 35.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Cabrito",
+    "porcion_desc": "1 plato",
+    "kcal": 950.0,
+    "proteina_g": 45.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Arroz con pollo",
+    "porcion_desc": "1 plato",
+    "kcal": 750.0,
+    "proteina_g": 30.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Aji de gallina",
+    "porcion_desc": "1 plato",
+    "kcal": 750.0,
+    "proteina_g": 28.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Seco de Chabelo",
+    "porcion_desc": "1 plato",
+    "kcal": 1000.0,
+    "proteina_g": 40.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Sudado",
+    "porcion_desc": "1 plato",
+    "kcal": 550.0,
+    "proteina_g": 38.0,
+    "hidr_ml": 0
+  },
 ]
 
 # =========================
