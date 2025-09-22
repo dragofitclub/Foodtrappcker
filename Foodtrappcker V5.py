@@ -1174,6 +1174,13 @@ BASE_INTERNA: List[Dict] = [
     "proteina_g": 38.0,
     "hidr_ml": 0
   },
+  {
+    "nombre": "Queso Fresco",
+    "porcion_desc": "1 tajada (30g)",
+    "kcal": 75.0,
+    "proteina_g": 5.0,
+    "hidr_ml": 0
+  },
 ]
 
 # =========================
