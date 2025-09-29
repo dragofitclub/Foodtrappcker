@@ -230,13 +230,6 @@ BASE_INTERNA: List[Dict] = [
     "hidr_ml": 0
   },
   {
-    "nombre": "Frijoles (cocidos)",
-    "porcion_desc": "100g",
-    "kcal": 127.0,
-    "proteina_g": 8.0,
-    "hidr_ml": 0
-  },
-  {
     "nombre": "Arvejas (cocidas)",
     "porcion_desc": "100g",
     "kcal": 84.0,
