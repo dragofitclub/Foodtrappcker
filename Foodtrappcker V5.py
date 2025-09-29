@@ -1244,6 +1244,20 @@ BASE_INTERNA: List[Dict] = [
     "proteina_g": 0.2,
     "hidr_ml": 0
   },
+  {
+    "nombre": "Champiñon",
+    "porcion_desc": "1 unidad",
+    "kcal": 5.0,
+    "proteina_g": 0.7,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Ciruela",
+    "porcion_desc": "1 unidad",
+    "kcal": 23.0,
+    "proteina_g": 0.3,
+    "hidr_ml": 0
+  },
 ]
 
 # =========================
