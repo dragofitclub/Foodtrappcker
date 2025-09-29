@@ -1216,6 +1216,27 @@ BASE_INTERNA: List[Dict] = [
     "proteina_g": 15.0,
     "hidr_ml": 0
   },
+  {
+    "nombre": "Maca (Carretilla)",
+    "porcion_desc": "1 vaso",
+    "kcal": 215.0,
+    "proteina_g": 6.5,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Soya (Carretilla)",
+    "porcion_desc": "1 vaso",
+    "kcal": 150.0,
+    "proteina_g": 9.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Kiwicha (Carretilla)",
+    "porcion_desc": "1 vaso",
+    "kcal": 185.0,
+    "proteina_g": 6.0,
+    "hidr_ml": 0
+  },
 ]
 
 # =========================
