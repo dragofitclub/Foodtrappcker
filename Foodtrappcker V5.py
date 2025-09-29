@@ -1265,6 +1265,20 @@ BASE_INTERNA: List[Dict] = [
     "proteina_g": 34.0,
     "hidr_ml": 0
   },
+  {
+    "nombre": "Granola",
+    "porcion_desc": "1 taza",
+    "kcal": 360.0,
+    "proteina_g": 8.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Granola",
+    "porcion_desc": "1 cda",
+    "kcal": 45.0,
+    "proteina_g": 1.0,
+    "hidr_ml": 0
+  },
 ]
 
 # =========================
