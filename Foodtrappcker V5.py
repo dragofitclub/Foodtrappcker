@@ -1209,6 +1209,13 @@ BASE_INTERNA: List[Dict] = [
     "proteina_g": 16.0,
     "hidr_ml": 0
   },
+  {
+    "nombre": "Anticucho",
+    "porcion_desc": "1 palo (sin acompañamiento)",
+    "kcal": 150.0,
+    "proteina_g": 15.0,
+    "hidr_ml": 0
+  },
 ]
 
 # =========================
