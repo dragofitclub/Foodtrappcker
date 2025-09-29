@@ -1258,6 +1258,13 @@ BASE_INTERNA: List[Dict] = [
     "proteina_g": 0.3,
     "hidr_ml": 0
   },
+  {
+    "nombre": "Pierna de pollo",
+    "porcion_desc": "1 unidad",
+    "kcal": 360.0,
+    "proteina_g": 34.0,
+    "hidr_ml": 0
+  },
 ]
 
 # =========================
