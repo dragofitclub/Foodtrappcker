@@ -174,10 +174,10 @@ BASE_INTERNA: List[Dict] = [
     "hidr_ml": 0
   },
   {
-    "nombre": "Nutrib Boost",
-    "porcion_desc": "1 scoop",
-    "kcal": 45.0,
-    "proteina_g": 4.5,
+    "nombre": "Olluquitos",
+    "porcion_desc": "1 plato",
+    "kcal": 195.0,
+    "proteina_g": 3.0,
     "hidr_ml": 0
   },
   {
