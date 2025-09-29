@@ -1237,6 +1237,13 @@ BASE_INTERNA: List[Dict] = [
     "proteina_g": 6.0,
     "hidr_ml": 0
   },
+  {
+    "nombre": "Fibra Activa",
+    "porcion_desc": "1 scoop",
+    "kcal": 27.0,
+    "proteina_g": 0.2,
+    "hidr_ml": 0
+  },
 ]
 
 # =========================
