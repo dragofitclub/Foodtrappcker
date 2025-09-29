@@ -170,7 +170,7 @@ BASE_INTERNA: List[Dict] = [
     "nombre": "PDM",
     "porcion_desc": "1 scoop",
     "kcal": 55.0,
-    "proteina_g": 5.0,
+    "proteina_g": 9.0,
     "hidr_ml": 0
   },
   {
@@ -183,8 +183,8 @@ BASE_INTERNA: List[Dict] = [
   {
     "nombre": "H24 Rebuild Strength",
     "porcion_desc": "1 scoop",
-    "kcal": 190.0,
-    "proteina_g": 24.0,
+    "kcal": 95.0,
+    "proteina_g": 12.5,
     "hidr_ml": 0
   },
   {
