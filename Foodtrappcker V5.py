@@ -209,10 +209,10 @@ BASE_INTERNA: List[Dict] = [
     "hidr_ml": 0
   },
   {
-    "nombre": "Batido Nutricional en Polvo",
-    "porcion_desc": "1 scoop",
-    "kcal": 90.0,
-    "proteina_g": 9.0,
+    "nombre": "Proteina Personalizada en Polvo (PPP)",
+    "porcion_desc": "1 scoop (6g)",
+    "kcal": 20.0,
+    "proteina_g": 5.0,
     "hidr_ml": 0
   },
   {
