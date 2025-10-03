@@ -1522,6 +1522,14 @@ df = construir_df_diario()
 
 sel_rows = []
 if not df.empty:
+    # ---- NUEVO: agregar ratio kcal/g proteína (None si prot <= 0) ----
+    df = df.copy()
+    df["kcal_por_g_prot"] = df.apply(
+        lambda r: round(r["kcal"] / r["proteina_g"], 2) if r["proteina_g"] and r["proteina_g"] > 0 else None,
+        axis=1
+    )
+    # ------------------------------------------------------------------
+
     df_display = df.copy()
     df_display.insert(0, "Seleccionar", False)
 
@@ -1537,6 +1545,7 @@ if not df.empty:
             "kcal": True,
             "proteina_g": True,
             "hidr_ml": True,
+            "kcal_por_g_prot": True,  # <- NUEVO: columna calculada bloqueada
         },
         key="editor_diario"
     )
