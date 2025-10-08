@@ -1279,6 +1279,20 @@ BASE_INTERNA: List[Dict] = [
     "proteina_g": 1.0,
     "hidr_ml": 0
   },
+  {
+    "nombre": "Ravioles rellenos espinaca",
+    "porcion_desc": "1 plato",
+    "kcal": 430.0,
+    "proteina_g": 17.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Ravioles rellenos carne",
+    "porcion_desc": "1 plato",
+    "kcal": 470.0,
+    "proteina_g": 22.0,
+    "hidr_ml": 0
+  },
 ]
 
 # =========================
