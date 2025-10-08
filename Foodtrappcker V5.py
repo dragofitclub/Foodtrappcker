@@ -204,8 +204,8 @@ BASE_INTERNA: List[Dict] = [
   {
     "nombre": "Beverage Mix",
     "porcion_desc": "1 scoop",
-    "kcal": 37.0,
-    "proteina_g": 15.0,
+    "kcal": 35.0,
+    "proteina_g": 7.5,
     "hidr_ml": 0
   },
   {
