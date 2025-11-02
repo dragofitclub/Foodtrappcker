@@ -132,6 +132,13 @@ BASE_INTERNA: List[Dict] = [
     "hidr_ml": 0
   },
   {
+    "nombre": "Rapidita",
+    "porcion_desc": "1 unidad",
+    "kcal": 145.0,
+    "proteina_g": 4.0,
+    "hidr_ml": 0
+  },
+  {
     "nombre": "Requesón (cottage 2%)",
     "porcion_desc": "100g",
     "kcal": 82.0,
