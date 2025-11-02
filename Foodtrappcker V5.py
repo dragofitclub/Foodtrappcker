@@ -62,6 +62,13 @@ BASE_INTERNA: List[Dict] = [
     "hidr_ml": 0
   },
   {
+    "nombre": "Hamburguesa (completa)",
+    "porcion_desc": "1 unidad",
+    "kcal": 615.0,
+    "proteina_g": 32.0,
+    "hidr_ml": 0
+  },
+  {
     "nombre": "Chuleta de cerdo magra (cruda)",
     "porcion_desc": "100g",
     "kcal": 143.0,
