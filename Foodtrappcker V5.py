@@ -52,6 +52,37 @@ h1 {
 """, unsafe_allow_html=True)
 
 # =========================
+# Logo superior derecho
+# =========================
+from pathlib import Path
+import base64
+
+logo_path = Path(__file__).parent / "Logohorizontal.png"
+
+with open(logo_path, "rb") as f:
+    logo_base64 = base64.b64encode(f.read()).decode()
+
+st.markdown(
+    f"""
+    <style>
+    [data-testid="stAppViewContainer"] {{
+        position: relative;
+    }}
+    .logo-tribu {{
+        position: absolute;
+        top: 10px;
+        right: 25px;
+        width: 180px;
+        z-index: 999;
+    }}
+    </style>
+    <img src="data:image/png;base64,{logo_base64}" class="logo-tribu">
+    """,
+    unsafe_allow_html=True
+)
+
+
+# =========================
 # BASE INTERNA (proporcionada)
 # =========================
 BASE_INTERNA: List[Dict] = [
