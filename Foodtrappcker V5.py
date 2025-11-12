@@ -20,14 +20,22 @@ HORA_FMT = "%H:%M"
 # =========================
 st.markdown("""
 <style>
-.block-container { padding-top: .5rem; padding-bottom: 2rem; max-width: 1200px; }
+.block-container {
+    padding-top: 2.2rem;       /* antes .5rem → más espacio superior */
+    padding-bottom: 2rem;
+    max-width: 1200px;
+}
+h1 {
+    line-height: 1.25;         /* evita que el emoji se recorte */
+    overflow: visible !important;
+}
 .stProgress > div > div { height: 16px; border-radius: 12px; }
 .stButton > button { padding: .65rem 1rem; border-radius: 12px; }
 .stNumberInput input, .stTextInput input { border-radius: 10px; }
 
 /* Móvil */
 @media (max-width: 480px) {
-  .block-container { padding-left: .6rem; padding-right: .6rem; }
+  .block-container { padding-left: .6rem; padding-right: .6rem; padding-top: 1.5rem; }
   .stProgress > div > div { height: 22px; }
   .stButton > button { width: 100%; font-size: 1rem; }
   .stNumberInput label, .stTextInput label, .stSelectbox label { font-size: 0.95rem; }
