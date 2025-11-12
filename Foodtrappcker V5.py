@@ -1403,7 +1403,14 @@ def construir_df_diario() -> pd.DataFrame:
 # =========================
 # UI - Título
 # =========================
-st.title("📒 Diario de Comidas")
+st.markdown(
+    """
+    <h1 style='text-align: center; color: white; font-weight: 800; margin-top: 10px; margin-bottom: 25px;'>
+        📒 Diario de Comidas
+    </h1>
+    """,
+    unsafe_allow_html=True
+)
 
 # =========================
 # 1) Perfil y requerimientos
