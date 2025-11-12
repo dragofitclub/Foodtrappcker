@@ -94,6 +94,20 @@ BASE_INTERNA: List[Dict] = [
     "hidr_ml": 0
   },
   {
+    "nombre": "Carne roja magra (cruda)",
+    "porcion_desc": "100g",
+    "kcal": 170.0,
+    "proteina_g": 27.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Carne roja (cruda)",
+    "porcion_desc": "100g",
+    "kcal": 280.0,
+    "proteina_g": 23.0,
+    "hidr_ml": 0
+  },
+  {
     "nombre": "Pavo (pechuga cruda, sin piel)",
     "porcion_desc": "100g",
     "kcal": 110.0,
