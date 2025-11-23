@@ -122,6 +122,27 @@ BASE_INTERNA: List[Dict] = [
     "hidr_ml": 0
   },
   {
+    "nombre": "Arepa",
+    "porcion_desc": "1 unidad",
+    "kcal": 218.0,
+    "proteina_g": 5.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Estofado de pollo",
+    "porcion_desc": "1 plato",
+    "kcal": 350.0,
+    "proteina_g": 22.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Estofado de res",
+    "porcion_desc": "1 plato",
+    "kcal": 450.0,
+    "proteina_g": 30.0,
+    "hidr_ml": 0
+  },
+  {
     "nombre": "Chuleta de cerdo magra (cruda)",
     "porcion_desc": "100g",
     "kcal": 143.0,
@@ -133,6 +154,41 @@ BASE_INTERNA: List[Dict] = [
     "porcion_desc": "100g",
     "kcal": 142.0,
     "proteina_g": 20.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Huevo Frtio",
+    "porcion_desc": "1 unidad",
+    "kcal": 110.0,
+    "proteina_g": 7.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Paella",
+    "porcion_desc": "1 plato",
+    "kcal": 400.0,
+    "proteina_g": 15.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Chicharron de cerdo",
+    "porcion_desc": "1 plato",
+    "kcal": 500.0,
+    "proteina_g": 40.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Clara de huevo",
+    "porcion_desc": "1 unidad",
+    "kcal": 4.0,
+    "proteina_g": 4.0,
+    "hidr_ml": 0
+  },
+  {
+    "nombre": "Bowl de Ensalada",
+    "porcion_desc": "1 unidad",
+    "kcal": 170.0,
+    "proteina_g": 4.0,
     "hidr_ml": 0
   },
   {
